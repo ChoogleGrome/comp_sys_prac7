@@ -8,7 +8,7 @@ class CompilerParser :
         @param tokens A list of tokens to be parsed
         """
         self.tokens = tokens
-        self.tree = None
+        # self.tree = None
         pass
     
 
@@ -19,9 +19,9 @@ class CompilerParser :
         """
 
         try:
-            self.mustBe("keyword", "class")
-            self.tree = ParseTree("class", None)
-            self.tree.addChild(self.compileClass())
+            if self.have("keyword", "class"):
+                self.tree = ParseTree("class", None)
+                self.tree.addChild(self.compileClass())
         except ParseException:
             raise ParseException("Not Class")
     
