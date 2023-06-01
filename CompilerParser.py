@@ -21,7 +21,7 @@ class CompilerParser :
         try:
             self.mustBe("keyword", "class")
             self.tree = ParseTree("class", None)
-            self.tree.addChild(self.compileClass(self.tree))
+            self.tree.addChild(self.compileClass())
         except ParseException:
             raise ParseException("Not Class")
     
