@@ -21,7 +21,7 @@ class CompilerParser :
             self.mustBe("keyword", "class")
             ret = self.compileClass()
         except ParseException:
-            raise ParseException("Not Class")
+            raise ParseException()
     
 
         return ret
@@ -48,9 +48,39 @@ class CompilerParser :
             program.addChild(self.mustBe("symbol", "}"))
 
         except ParseException:
-            raise ParseException("Error creating class tree")
+            raise ParseException()
 
         return program
+    
+    def staticOrField(self):
+        """
+        Checks if val is either static or field
+        @return "static" or "field" or ParseException
+        """
+
+        if self.have(None, "static"): 
+            return "static"
+        elif self.have(None, "field"): 
+            return "field"
+        else: 
+            raise ParseException()
+
+    def varType(self):
+        """
+        Checks if val is any of the var types
+        @return Var types or ParseException
+        """
+
+        if self.have(None, "int"): 
+            return "int"
+        elif self.have(None, "char"):
+            return "char"
+        elif self.have(None, "boolean"):
+            return "boolean"
+        elif self.have(None, "void"):
+            return "void"
+        else:
+            raise ParseException()
     
 
     def compileClassVarDec(self):
@@ -61,14 +91,29 @@ class CompilerParser :
 
         try:
             classVar = ParseTree("classVarDec")
-            classVar.addChild(self.mustBe("keyword", None))
-            classVar.addChild(self.mustBe("keyword", None))
+            classVar.addChild(self.mustBe("keyword", self.staticOrField()))
+            classVar.addChild(self.mustBe("keyword", self.varType()))
             classVar.addChild(self.mustBe("identifier", None))
             classVar.addChild(self.mustBe("symbol", ";"))
         except ParseException:
-            raise ParseException("Error ClassVarDec")
+            raise ParseException()
 
         return classVar 
+    
+    def subroutineTypeCheck(self):
+        """
+        Checks if val is any of the subroutine accepted types
+        @return subroutine accepted types or ParseException
+        """
+
+        if self.have(None, "constructor"): 
+            return "static"
+        elif self.have(None, "function"): 
+            return "field"
+        elif self.have(None, "method"): 
+            return "field"
+        else: 
+            raise ParseException()
     
 
     def compileSubroutine(self):
@@ -79,15 +124,16 @@ class CompilerParser :
 
         try:
             subroutine = ParseTree("subroutine", None)
-            subroutine.addChild(self.mustBe("keyword", None))
-            subroutine.addChild(self.mustBe("keyword", None))
+            subroutine.addChild(self.mustBe("keyword", self.subroutineTypeCheck()))
+            subroutine.addChild(self.mustBe("keyword", self.varType()))
             subroutine.addChild(self.mustBe("identifier", None))
             subroutine.addChild(self.mustBe("symbol", "("))
-            subroutine.addChild(self.compileParameterList())
+            if self.have("symbol", ")") is False:
+                subroutine.addChild(self.compileParameterList())
             subroutine.addChild(self.mustBe("symbol", ")"))
             subroutine.addChild(self.compileSubroutineBody())
         except ParseException:
-            raise ParseException("Error Subroutine")
+            raise ParseException()
 
         return subroutine 
     
@@ -101,13 +147,13 @@ class CompilerParser :
         try:
             params = ParseTree("parameterList", None)
             while self.have("symbol", ")") is False:
-                params.addChild(self.mustBe("keyword", None))
+                params.addChild(self.mustBe("keyword", self.varType()))
                 params.addChild(self.mustBe("identifier", None))
                 if self.have("symbol", ","):
                     params.addChild(self.mustBe("symbol", ","))
         
         except ParseException:
-            raise ParseException("Error Subroutine Params")
+            raise ParseException()
 
         return params 
     
@@ -129,7 +175,7 @@ class CompilerParser :
                     body.addChild(self.compileStatements())
                 
         except ParseException:
-            raise ParseException("Error Subroutine Body")
+            raise ParseException()
         
         return body 
     
@@ -143,11 +189,11 @@ class CompilerParser :
         try:
             varDec = ParseTree("varDec", None)
             varDec.addChild(self.mustBe("keyword", "var"))
-            varDec.addChild(self.mustBe("keyword", None))
+            varDec.addChild(self.mustBe("keyword", self.varType()))
             varDec.addChild(self.mustBe("identifier", None))
             varDec.addChild(self.mustBe("symbol", ";"))
         except ParseException:
-            raise ParseException("Error Var Dec")
+            raise ParseException()
 
         return varDec 
     
@@ -288,9 +334,14 @@ if __name__ == "__main__":
     """
     tokens = []
     tokens.append(Token("keyword","class"))
-    tokens.append(Token("identifier","MyClass"))
+    tokens.append(Token("identifier","Main"))
     tokens.append(Token("symbol","{"))
     tokens.append(Token("symbol","}"))
+
+    # tokens.append(Token("keyword", "static"))
+    # tokens.append(Token("keyword", "int"))
+    # tokens.append(Token("identifier", "a"))
+    # tokens.append(Token("symbol", ";"))
 
     parser = CompilerParser(tokens)
     try:
