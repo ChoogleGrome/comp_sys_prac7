@@ -19,11 +19,8 @@ class CompilerParser :
         """
 
         try:
-            if self.have("keyword", "class"):
-                self.tree = ParseTree("class", None)
-                self.tree.addChild(self.compileClass())
-            else:
-                raise ParseException("Error Program")
+            self.mustBe("keyword", "class")
+            self.compileClass()
         except ParseException:
             raise ParseException("Not Class")
     
@@ -38,6 +35,7 @@ class CompilerParser :
         """
 
         try:
+            self.tree = ParseTree("class", None)
             self.tree.addChild(Token("keyword", "class"))
             self.tree.addChild(self.mustBe("identifier", None))
             self.tree.addChild(self.mustBe("symbol", "{"))
