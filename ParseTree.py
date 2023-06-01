@@ -66,7 +66,7 @@ class ParseTree():
         if(len(self.children)>0):
             # Output if the node has children
             output += self.node_type + "\n"
-            for child in children:
+            for child in self.children:
                 output += indent + "  \u2514 " + child.__str__(depth+1)
             
             output += indent + "\n"

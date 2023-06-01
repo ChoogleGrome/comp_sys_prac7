@@ -144,7 +144,7 @@ class CompilerParser :
             varDec = ParseTree("varDec", None)
             varDec.addChild(self.mustBe("keyword", "var"))
             varDec.addChild(self.mustBe("keyword", None))
-            varDec.addChild(self.mustBe("indentifier", None))
+            varDec.addChild(self.mustBe("identifier", None))
             varDec.addChild(self.mustBe("symbol", ";"))
         except ParseException:
             raise ParseException("Error Var Dec")
