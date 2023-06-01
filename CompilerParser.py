@@ -41,9 +41,9 @@ class CompilerParser :
 
             while self.have("symbol", "}") is False:
                 if self.have("keyword", "static") or self.have("keyword", "field"):
-                    self.compileClassVarDec()
+                    program.addChild(self.compileClassVarDec())
                 elif self.have("keyword", "constructor") or self.have("keyword", "function") or self.have("keyword", "method"):
-                    self.compileSubroutine()
+                    program.addChild(self.compileSubroutine())
 
             program.addChild(self.mustBe("symbol", "}"))
 
@@ -90,7 +90,7 @@ class CompilerParser :
         """
 
         try:
-            classVar = ParseTree("classVarDec")
+            classVar = ParseTree("classVarDec", None)
             classVar.addChild(self.mustBe("keyword", self.staticOrField()))
             classVar.addChild(self.mustBe("keyword", self.varType()))
             classVar.addChild(self.mustBe("identifier", None))
@@ -107,11 +107,11 @@ class CompilerParser :
         """
 
         if self.have(None, "constructor"): 
-            return "static"
+            return "constructor"
         elif self.have(None, "function"): 
-            return "field"
+            return "function"
         elif self.have(None, "method"): 
-            return "field"
+            return "method"
         else: 
             raise ParseException()
     
@@ -165,7 +165,7 @@ class CompilerParser :
         """
 
         try:
-            body = ParseTree("subroutineBody")
+            body = ParseTree("subroutineBody", None)
 
             body.addChild(self.mustBe("symbol", "{"))
             while self.have("symbol", "}") is False:
@@ -333,19 +333,44 @@ if __name__ == "__main__":
         }
     """
     tokens = []
-    tokens.append(Token("keyword","class"))
-    tokens.append(Token("identifier","Main"))
-    tokens.append(Token("symbol","{"))
-    tokens.append(Token("symbol","}"))
+    # tokens.append(Token("keyword","class"))
+    # tokens.append(Token("identifier","Main"))
+    # tokens.append(Token("symbol","{"))
+    # tokens.append(Token("symbol","}"))
 
     # tokens.append(Token("keyword", "static"))
     # tokens.append(Token("keyword", "int"))
     # tokens.append(Token("identifier", "a"))
     # tokens.append(Token("symbol", ";"))
 
+    # tokens.append(Token("keyword","class"))
+    # tokens.append(Token("identifier","Main"))
+    # tokens.append(Token("symbol","{"))
+    # tokens.append(Token("keyword", "static"))
+    # tokens.append(Token("keyword", "int"))
+    # tokens.append(Token("identifier", "a"))
+    # tokens.append(Token("symbol", ";"))
+    # tokens.append(Token("symbol","}"))
+
+    tokens.append(Token("keyword", "function"))
+    tokens.append(Token("keyword", "void"))
+    tokens.append(Token("identifier", "myFunc"))
+    tokens.append(Token("symbol", "("))
+    tokens.append(Token("keyword", "int"))
+    tokens.append(Token("identifier", "a"))
+    tokens.append(Token("symbol", ")"))
+    tokens.append(Token("symbol", "{"))
+    tokens.append(Token("keyword", "var"))
+    tokens.append(Token("keyword", "int"))
+    tokens.append(Token("identifier", "a"))
+    tokens.append(Token("symbol", ";"))
+    tokens.append(Token("symbol","}"))
+
+
     parser = CompilerParser(tokens)
     try:
-        result = parser.compileProgram()
+        # result = parser.compileProgram()
+        result = parser.compileSubroutine()
         print(result)
     except ParseException:
         print("Error Parsing!")
