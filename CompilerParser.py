@@ -8,6 +8,7 @@ class CompilerParser :
         @param tokens A list of tokens to be parsed
         """
         self.tokens = tokens
+        self.tree = None
         pass
     
 
@@ -17,16 +18,15 @@ class CompilerParser :
         @return a ParseTree that represents the program
         """
 
-        program = ParseTree()
-
         try:
             self.mustBe("keyword", "class")
+            self.tree = ParseTree("class", None)
+            self.tree.addChild(self.compileClass(self.tree))
         except ParseException:
             raise ParseException("Not Class")
-        
-        program.addChild(self.compileClass())
+    
 
-        return program
+        return self.tree
     
     
     def compileClass(self):
@@ -35,12 +35,10 @@ class CompilerParser :
         @return a ParseTree that represents a class
         """
 
-        classTree = ParseTree()
-
         try:
-            classTree.addChild(Token("keyword", "class"))
-            classTree.addChild(self.mustBe("identifier", None))
-            classTree.addChild(self.mustBe("symbol", "{"))
+            self.tree.addChild(Token("keyword", "class"))
+            self.tree.addChild(self.mustBe("identifier", None))
+            self.tree.addChild(self.mustBe("symbol", "{"))
 
             while self.have("symbol", "}") or self.have() is None:
                 if self.have("keyword", "static") or self.have("keyword", "field"):
@@ -49,12 +47,12 @@ class CompilerParser :
                     self.compileSubroutine()
 
 
-            classTree.addChild(self.mustBe("symbol", "}"))
+            self.tree.addChild(self.mustBe("symbol", "}"))
 
         except ParseException:
             raise ParseException("Error creating class tree")
 
-        return classTree 
+        return self.tree 
     
 
     def compileClassVarDec(self):
