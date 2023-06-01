@@ -22,6 +22,8 @@ class CompilerParser :
             if self.have("keyword", "class"):
                 self.tree = ParseTree("class", None)
                 self.tree.addChild(self.compileClass())
+            else:
+                raise ParseException("Error Program")
         except ParseException:
             raise ParseException("Not Class")
     
