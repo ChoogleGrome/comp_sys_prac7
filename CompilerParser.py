@@ -51,37 +51,6 @@ class CompilerParser :
             raise ParseException()
 
         return program
-    
-    def staticOrField(self):
-        """
-        Checks if val is either static or field
-        @return "static" or "field" or ParseException
-        """
-
-        if self.have(None, "static"): 
-            return "static"
-        elif self.have(None, "field"): 
-            return "field"
-        else: 
-            raise ParseException()
-
-    def varType(self):
-        """
-        Checks if val is any of the var types
-        @return Var types or ParseException
-        """
-
-        if self.have(None, "int"): 
-            return "int"
-        elif self.have(None, "char"):
-            return "char"
-        elif self.have(None, "boolean"):
-            return "boolean"
-        elif self.have(None, "void"):
-            return "void"
-        else:
-            raise ParseException()
-    
 
     def compileClassVarDec(self):
         """
@@ -91,8 +60,8 @@ class CompilerParser :
 
         try:
             classVar = ParseTree("classVarDec", None)
-            classVar.addChild(self.mustBe("keyword", self.staticOrField()))
-            classVar.addChild(self.mustBe("keyword", self.varType()))
+            classVar.addChild(self.mustBe("keyword", self.classVarTypeCheck()))
+            classVar.addChild(self.mustBe("keyword", self.varTypeCheck()))
             classVar.addChild(self.mustBe("identifier", None))
             classVar.addChild(self.mustBe("symbol", ";"))
         except ParseException:
@@ -125,7 +94,7 @@ class CompilerParser :
         try:
             subroutine = ParseTree("subroutine", None)
             subroutine.addChild(self.mustBe("keyword", self.subroutineTypeCheck()))
-            subroutine.addChild(self.mustBe("keyword", self.varType()))
+            subroutine.addChild(self.mustBe("keyword", self.varTypeCheck()))
             subroutine.addChild(self.mustBe("identifier", None))
             subroutine.addChild(self.mustBe("symbol", "("))
             if self.have("symbol", ")") is False:
@@ -147,7 +116,7 @@ class CompilerParser :
         try:
             params = ParseTree("parameterList", None)
             while self.have("symbol", ")") is False:
-                params.addChild(self.mustBe("keyword", self.varType()))
+                params.addChild(self.mustBe("keyword", self.varTypeCheck()))
                 params.addChild(self.mustBe("identifier", None))
                 if self.have("symbol", ","):
                     params.addChild(self.mustBe("symbol", ","))
@@ -189,7 +158,7 @@ class CompilerParser :
         try:
             varDec = ParseTree("varDec", None)
             varDec.addChild(self.mustBe("keyword", "var"))
-            varDec.addChild(self.mustBe("keyword", self.varType()))
+            varDec.addChild(self.mustBe("keyword", self.varTypeCheck()))
             varDec.addChild(self.mustBe("identifier", None))
             varDec.addChild(self.mustBe("symbol", ";"))
         except ParseException:
@@ -203,7 +172,29 @@ class CompilerParser :
         Generates a parse tree for a series of statements
         @return a ParseTree that represents the series of statements
         """
-        return None 
+
+        try :
+            statements = ParseTree("statements", None)
+
+            if self.current().getType() is not "keyword": raise ParseException()
+
+            statementVal = checkStatementType(self.current().getValue())
+
+            if statementVal is "let":
+                statements.addChild(self.compileLet())
+            elif statementVal is "if":
+                statements.addChild(self.compileIf())
+            elif statementVal is "while":
+                statements.addChild(self.compileWhile())
+            elif statementVal is "do":
+                statements.addChild(self.compileDo())
+            elif statementVal is "return":
+                statements.addChild(self.compileReturn())
+
+        except ParseException:
+            raise ParseException()
+
+        return statements 
     
     
     def compileLet(self):
@@ -211,7 +202,19 @@ class CompilerParser :
         Generates a parse tree for a let statement
         @return a ParseTree that represents the statement
         """
-        return None 
+
+        try:
+            letTree = ParseTree("letStatement", None)
+
+            letTree.addChild(self.mustBe("keyword", "let"))
+            letTree.addChild(self.mustBe("identifier", None))
+            letTree.addChild(self.mustBe("symbol", "="))
+            letTree.addChild(self.compileExpression())
+            letTree.addChild(self.mustBe("symbol", ";"))
+        except ParseException:
+            raise ParseException()
+
+        return letTree 
 
 
     def compileIf(self):
@@ -219,7 +222,29 @@ class CompilerParser :
         Generates a parse tree for an if statement
         @return a ParseTree that represents the statement
         """
-        return None 
+        try:
+            ifTree = ParseTree("ifStatement", None)
+
+            ifTree.addChild(self.mustBe("keyword", "if"))
+            ifTree.addChild(self.mustBe("symbol", "("))
+            ifTree.addChild(self.compileExpression())
+            ifTree.addChild(self.mustBe("symbol", ")"))
+            ifTree.addChild(self.mustBe("symbol", "{"))
+            while self.have("symbol", "}") is False:
+                ifTree.addChild(self.compileStatements())
+            ifTree.addChild(self.mustBe("symbol", "}"))
+
+            if self.have("keyword", "else") is True:
+                ifTree.addChild(self.mustBe("keyword", "else"))
+                ifTree.addChild(self.mustBe("symbol", "{"))
+                while self.have("symbol", "}") is False:
+                    ifTree.addChild(self.compileStatements())
+                ifTree.addChild(self.mustBe("symbol", "}"))
+
+        except ParseException:
+            raise ParseException()
+
+        return ifTree 
 
     
     def compileWhile(self):
@@ -227,7 +252,21 @@ class CompilerParser :
         Generates a parse tree for a while statement
         @return a ParseTree that represents the statement
         """
-        return None 
+        try:
+            whileTree = ParseTree("whileStatement", None)
+
+            whileTree.addChild(self.mustBe("keyword", "while"))
+            whileTree.addChild(self.mustBe("symbol", "("))
+            whileTree.addChild(self.compileExpression())
+            whileTree.addChild(self.mustBe("symbol", ")"))
+            whileTree.addChild(self.mustBe("symbol", "{"))
+            while self.have("symbol", "}") is False:
+                whileTree.addChild(self.compileStatements())
+            whileTree.addChild(self.mustBe("symbol", "}"))
+
+        except ParseException:
+            raise ParseException()
+        return whileTree 
 
 
     def compileDo(self):
@@ -235,7 +274,17 @@ class CompilerParser :
         Generates a parse tree for a do statement
         @return a ParseTree that represents the statement
         """
-        return None 
+
+        try:
+            doTree = ParseTree("doStatement", None)
+
+            doTree.addChild(self.mustBe("keyword", "do"))
+            doTree.addChild(self.compileExpression())
+            doTree.addChild(self.mustBe("symbol", ";"))
+
+        except ParseException:
+            raise ParseException()
+        return doTree 
 
 
     def compileReturn(self):
@@ -243,7 +292,16 @@ class CompilerParser :
         Generates a parse tree for a return statement
         @return a ParseTree that represents the statement
         """
-        return None 
+        try:
+            returnTree = ParseTree("returnStatement", None)
+
+            returnTree.addChild(self.mustBe("keyword", "return"))
+            returnTree.addChild(self.compileExpression())
+            returnTree.addChild(self.mustBe("symbol", ";"))
+
+        except ParseException:
+            raise ParseException()
+        return returnTree
 
 
     def compileExpression(self):
@@ -251,7 +309,11 @@ class CompilerParser :
         Generates a parse tree for an expression
         @return a ParseTree that represents the expression
         """
-        return None 
+
+        expression = ParseTree("expression")
+        expression.addChild(self.mustBe("keyword", "skip"))
+
+        return expression 
 
 
     def compileTerm(self):
@@ -267,7 +329,7 @@ class CompilerParser :
         Generates a parse tree for an expression list
         @return a ParseTree that represents the expression list
         """
-        return None 
+        return None
 
 
     def next(self):
@@ -322,6 +384,57 @@ class CompilerParser :
             return currentToken
         
         raise ParseException("Not Matching")
+
+    def classVarTypeCheck(self):
+        """
+        Checks if val is either static or field
+        @return "static" or "field" or ParseException
+        """
+
+        if self.have(None, "static"): 
+            return "static"
+        elif self.have(None, "field"): 
+            return "field"
+        else: 
+            raise ParseException()
+
+    def varTypeCheck(self):
+        """
+        Checks if val is any of the var types
+        @return Var types or ParseException
+        """
+
+        if self.have(None, "int"): 
+            return "int"
+        elif self.have(None, "char"):
+            return "char"
+        elif self.have(None, "boolean"):
+            return "boolean"
+        elif self.have(None, "void"):
+            return "void"
+        else:
+            raise ParseException()
+        
+
+    def checkStatementType(self):
+        """
+        Checks if val is any of the statement types
+        @return statement types or ParseException
+        """       
+
+        if self.have(None, "let"): 
+            return "int"
+        elif self.have(None, "if"):
+            return "char"
+        elif self.have(None, "while"):
+            return "boolean"
+        elif self.have(None, "do"):
+            return "void"
+        elif self.have(None, "return"):
+            return "void"
+        else:
+            raise ParseException()
+    
 
 if __name__ == "__main__":
 
