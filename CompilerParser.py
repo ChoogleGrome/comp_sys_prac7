@@ -176,19 +176,19 @@ class CompilerParser :
         try :
             statements = ParseTree("statements", None)
 
-            if self.current().getType() is not "keyword": raise ParseException()
+            if self.current().getType() != "keyword": raise ParseException()
 
             statementVal = checkStatementType(self.current().getValue())
 
-            if statementVal is "let":
+            if statementVal == "let":
                 statements.addChild(self.compileLet())
-            elif statementVal is "if":
+            elif statementVal == "if":
                 statements.addChild(self.compileIf())
-            elif statementVal is "while":
+            elif statementVal == "while":
                 statements.addChild(self.compileWhile())
-            elif statementVal is "do":
+            elif statementVal == "do":
                 statements.addChild(self.compileDo())
-            elif statementVal is "return":
+            elif statementVal == "return":
                 statements.addChild(self.compileReturn())
 
         except ParseException:
@@ -446,44 +446,44 @@ if __name__ == "__main__":
         }
     """
     tokens = []
-    # tokens.append(Token("keyword","class"))
-    # tokens.append(Token("identifier","Main"))
-    # tokens.append(Token("symbol","{"))
-    # tokens.append(Token("symbol","}"))
-
-    # tokens.append(Token("keyword", "static"))
-    # tokens.append(Token("keyword", "int"))
-    # tokens.append(Token("identifier", "a"))
-    # tokens.append(Token("symbol", ";"))
-
-    # tokens.append(Token("keyword","class"))
-    # tokens.append(Token("identifier","Main"))
-    # tokens.append(Token("symbol","{"))
-    # tokens.append(Token("keyword", "static"))
-    # tokens.append(Token("keyword", "int"))
-    # tokens.append(Token("identifier", "a"))
-    # tokens.append(Token("symbol", ";"))
-    # tokens.append(Token("symbol","}"))
-
-    tokens.append(Token("keyword", "function"))
-    tokens.append(Token("keyword", "void"))
-    tokens.append(Token("identifier", "myFunc"))
-    tokens.append(Token("symbol", "("))
-    tokens.append(Token("keyword", "int"))
-    tokens.append(Token("identifier", "a"))
-    tokens.append(Token("symbol", ")"))
-    tokens.append(Token("symbol", "{"))
-    tokens.append(Token("keyword", "var"))
-    tokens.append(Token("keyword", "int"))
-    tokens.append(Token("identifier", "a"))
-    tokens.append(Token("symbol", ";"))
+    tokens.append(Token("keyword","class"))
+    tokens.append(Token("identifier","Main"))
+    tokens.append(Token("symbol","{"))
     tokens.append(Token("symbol","}"))
+
+    # tokens.append(Token("keyword", "static"))
+    # tokens.append(Token("keyword", "int"))
+    # tokens.append(Token("identifier", "a"))
+    # tokens.append(Token("symbol", ";"))
+
+    # tokens.append(Token("keyword","class"))
+    # tokens.append(Token("identifier","Main"))
+    # tokens.append(Token("symbol","{"))
+    # tokens.append(Token("keyword", "static"))
+    # tokens.append(Token("keyword", "int"))
+    # tokens.append(Token("identifier", "a"))
+    # tokens.append(Token("symbol", ";"))
+    # tokens.append(Token("symbol","}"))
+
+    # tokens.append(Token("keyword", "function"))
+    # tokens.append(Token("keyword", "void"))
+    # tokens.append(Token("identifier", "myFunc"))
+    # tokens.append(Token("symbol", "("))
+    # tokens.append(Token("keyword", "int"))
+    # tokens.append(Token("identifier", "a"))
+    # tokens.append(Token("symbol", ")"))
+    # tokens.append(Token("symbol", "{"))
+    # tokens.append(Token("keyword", "var"))
+    # tokens.append(Token("keyword", "int"))
+    # tokens.append(Token("identifier", "a"))
+    # tokens.append(Token("symbol", ";"))
+    # tokens.append(Token("symbol","}"))
 
 
     parser = CompilerParser(tokens)
     try:
-        # result = parser.compileProgram()
-        result = parser.compileSubroutine()
+        result = parser.compileProgram()
+        # result = parser.compileSubroutine()
         print(result)
     except ParseException:
         print("Error Parsing!")
