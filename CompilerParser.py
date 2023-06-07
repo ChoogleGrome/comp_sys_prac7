@@ -103,7 +103,7 @@ class CompilerParser :
             classVar.addChild(self.mustBe("keyword", self.varTypeCheck()))
             classVar.addChild(self.mustBe("identifier", None))
             while self.have("symbol", ",") is True:
-                classVar.addChild("symbol", ",")
+                classVar.addChild(self.mustBe("symbol", ","))
                 classVar.addChild(self.mustBe("identifier", None))
             classVar.addChild(self.mustBe("symbol", ";"))
         except ParseException:
