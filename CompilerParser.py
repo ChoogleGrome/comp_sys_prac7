@@ -182,6 +182,7 @@ class CompilerParser :
                     body.addChild(self.compileVarDec())
                 elif self.have("keyword", "let") or self.have("keyword", "if") or self.have("keyword", "while") or self.have("keyword", "do") or self.have("keyword", "return"):
                     body.addChild(self.compileStatements())
+            body.addChild(self.mustBe("symbol", "}"))
             
         except ParseException:
             raise ParseException()
@@ -450,10 +451,10 @@ if __name__ == "__main__":
         }
     """
     tokens = []
-    tokens.append(Token("keyword","class"))
-    tokens.append(Token("identifier","Main"))
-    tokens.append(Token("symbol","{"))
-    tokens.append(Token("symbol","}"))
+    # tokens.append(Token("keyword","class"))
+    # tokens.append(Token("identifier","Main"))
+    # tokens.append(Token("symbol","{"))
+    # tokens.append(Token("symbol","}"))
 
     # tokens.append(Token("keyword", "static"))
     # tokens.append(Token("keyword", "int"))
@@ -510,6 +511,18 @@ if __name__ == "__main__":
     # tokens.append(Token("symbol", ";"))
     # tokens.append(Token("symbol","}"))
 
+
+    tokens.append(Token("keyword","class"))
+    tokens.append(Token("identifier","Main"))
+    tokens.append(Token("symbol","{"))
+    tokens.append(Token("keyword","function"))
+    tokens.append(Token("keyword","void"))
+    tokens.append(Token("identifier","test"))
+    tokens.append(Token("symbol","("))
+    tokens.append(Token("symbol",")"))
+    tokens.append(Token("symbol","{"))
+    tokens.append(Token("symbol","}"))
+    tokens.append(Token("symbol","}"))
 
     parser = CompilerParser(tokens)
     try:
