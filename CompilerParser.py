@@ -140,11 +140,12 @@ class CompilerParser :
 
             if subroutineType == "constructor":
                 subroutine.addChild(self.mustBe("identifier", None))
-                subroutine.addChild(self.mustBe("keyword", "new"))
+                # subroutine.addChild(self.mustBe("keyword", "new"))
+                subroutine.addChild(Token("keyword", "new"))
             else:
                 subroutine.addChild(self.mustBe("keyword", self.varTypeCheck()))
                 subroutine.addChild(self.mustBe("identifier", None))
-                
+
             subroutine.addChild(self.mustBe("symbol", "("))
             if self.have("symbol", ")") is False:
                 subroutine.addChild(self.compileParameterList())
@@ -459,10 +460,13 @@ if __name__ == "__main__":
         }
     """
     tokens = []
-    # tokens.append(Token("keyword","class"))
-    # tokens.append(Token("identifier","Main"))
-    # tokens.append(Token("symbol","{"))
-    # tokens.append(Token("symbol","}"))
+    tokens.append(Token("keyword","constructor"))
+    tokens.append(Token("identifier","Main"))
+    tokens.append(Token("keyword","new"))
+    tokens.append(Token("symbol","("))
+    tokens.append(Token("symbol",")"))
+    tokens.append(Token("symbol","{"))
+    tokens.append(Token("symbol","}"))
 
     # tokens.append(Token("keyword", "static"))
     # tokens.append(Token("keyword", "int"))
@@ -544,8 +548,8 @@ if __name__ == "__main__":
 
     parser = CompilerParser(tokens)
     try:
-        result = parser.compileProgram()
-        # result = parser.compileSubroutine()
+        # result = parser.compileProgram()
+        result = parser.compileSubroutine()
         print(result)
     except ParseException:
         print("Error Parsing!")
