@@ -135,9 +135,16 @@ class CompilerParser :
 
         try:
             subroutine = ParseTree("subroutine", None)
-            subroutine.addChild(self.mustBe("keyword", self.subroutineTypeCheck()))
-            subroutine.addChild(self.mustBe("keyword", self.varTypeCheck()))
-            subroutine.addChild(self.mustBe("identifier", None))
+            subroutineType = self.subroutineTypeCheck()
+            subroutine.addChild(self.mustBe("keyword", subroutineType))
+
+            if subroutineType == "constructor":
+                subroutine.addChild(self.mustBe("identifier", None))
+                subroutine.addChild(self.mustBe("keyword", "new"))
+            else:
+                subroutine.addChild(self.mustBe("keyword", self.varTypeCheck()))
+                subroutine.addChild(self.mustBe("identifier", None))
+                
             subroutine.addChild(self.mustBe("symbol", "("))
             if self.have("symbol", ")") is False:
                 subroutine.addChild(self.compileParameterList())
